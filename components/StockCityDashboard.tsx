@@ -2,14 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Building2, Cloud, User, TrendingUp, TrendingDown, LogOut } from 'lucide-react';
+import { Building2, Cloud, User, TrendingUp, TrendingDown, LogOut, Database } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { StockDataManager } from './StockDataManager';
 
 const StockCity3D = dynamic(() => import('./StockCity3D'), { ssr: false });
 const StockCityRealistic = dynamic(() => import('./StockCityRealistic'), { ssr: false });
@@ -202,8 +204,23 @@ export function StockCityDashboard() {
         </div>
       </header>
 
-      <div className="flex h-[calc(100vh-88px)]">
-        <aside className="w-72 bg-slate-800/50 backdrop-blur-sm p-6 space-y-6 border-r border-slate-700 overflow-y-auto">
+      <Tabs defaultValue="3d-view" className="flex-1 flex flex-col h-[calc(100vh-88px)]">
+        <div className="px-8 pt-4 border-b border-slate-700">
+          <TabsList className="bg-slate-800">
+            <TabsTrigger value="3d-view">
+              <Building2 className="w-4 h-4 mr-2" />
+              3D View
+            </TabsTrigger>
+            <TabsTrigger value="stock-data">
+              <Database className="w-4 h-4 mr-2" />
+              Stock Data
+            </TabsTrigger>
+          </TabsList>
+        </div>
+
+        <TabsContent value="3d-view" className="flex-1 flex m-0">
+          <div className="flex flex-1 h-full">
+            <aside className="w-72 bg-slate-800/50 backdrop-blur-sm p-6 space-y-6 border-r border-slate-700 overflow-y-auto">
           <div>
             <Label className="text-sm font-medium mb-2 block">Sector</Label>
             <Select value={sector} onValueChange={setSector}>
@@ -403,7 +420,15 @@ export function StockCityDashboard() {
             )}
           </footer>
         </main>
-      </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="stock-data" className="flex-1 m-0 overflow-auto">
+          <div className="p-8">
+            <StockDataManager />
+          </div>
+        </TabsContent>
+      </Tabs>
 
     </div>
   );
