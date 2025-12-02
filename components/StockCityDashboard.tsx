@@ -423,10 +423,8 @@ export function StockCityDashboard() {
           </div>
         </TabsContent>
 
-        <TabsContent value="stock-data" className="flex-1 m-0 overflow-auto">
-          <div className="p-8">
-            <StockDataManager />
-          </div>
+        <TabsContent value="stock-data" className="flex-1 m-0 overflow-auto p-8">
+          <StockDataManager />
         </TabsContent>
       </Tabs>
 
