@@ -64,30 +64,40 @@ export function StockCityDashboard() {
 
   const fetchStockData = async () => {
     try {
-      const stockPromises = stockSymbols.map(async (symbol) => {
-        const response = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`);
-        const data = await response.json();
+      const basePrices: { [key: string]: { price: number; name: string } } = {
+        'AAPL': { price: 175.43, name: 'Apple Inc.' },
+        'GOOGL': { price: 138.21, name: 'Alphabet Inc.' },
+        'MSFT': { price: 378.85, name: 'Microsoft Corporation' },
+        'AMZN': { price: 144.98, name: 'Amazon.com Inc.' },
+        'TSLA': { price: 219.16, name: 'Tesla Inc.' },
+        'META': { price: 296.73, name: 'Meta Platforms Inc.' },
+        'NVDA': { price: 481.86, name: 'NVIDIA Corporation' },
+        'NFLX': { price: 421.25, name: 'Netflix Inc.' }
+      };
 
-        const quote = data.chart.result[0];
-        const meta = quote.meta;
+      const stockData = stockSymbols.map((symbol) => {
+        const baseInfo = basePrices[symbol];
+        const variation = (Math.random() - 0.5) * 0.02;
+        const price = baseInfo.price * (1 + variation);
+        const changePercent = (Math.random() - 0.5) * 6;
+        const previousClose = price / (1 + changePercent / 100);
 
         return {
-          symbol: meta.symbol,
-          name: meta.longName || meta.symbol,
-          price: meta.regularMarketPrice,
-          change: meta.regularMarketPrice - meta.chartPreviousClose,
-          changePercent: ((meta.regularMarketPrice - meta.chartPreviousClose) / meta.chartPreviousClose) * 100,
-          high: meta.regularMarketDayHigh,
-          low: meta.regularMarketDayLow,
-          open: meta.regularMarketOpen || meta.chartPreviousClose,
-          previousClose: meta.chartPreviousClose,
-          volume: meta.regularMarketVolume,
-          marketCap: meta.marketCap,
+          symbol,
+          name: baseInfo.name,
+          price,
+          change: price - previousClose,
+          changePercent,
+          high: price * (1 + Math.random() * 0.02),
+          low: price * (1 - Math.random() * 0.02),
+          open: previousClose * (1 + (Math.random() - 0.5) * 0.01),
+          previousClose,
+          volume: Math.floor(Math.random() * 50000000) + 10000000,
+          marketCap: price * (Math.random() * 5000000000 + 1000000000),
           sentiment: Math.random() * 2 - 1
         };
       });
 
-      const stockData = await Promise.all(stockPromises);
       setStocks(stockData);
       if (!selectedStock && stockData.length > 0) {
         setSelectedStock(stockData[0]);
@@ -101,26 +111,26 @@ export function StockCityDashboard() {
 
   const fetchMarketIndices = async () => {
     try {
-      const indices = [
-        { symbol: '^GSPC', name: 'S&P 500' },
-        { symbol: '^IXIC', name: 'NASDAQ' },
-        { symbol: '^DJI', name: 'DOW' }
+      const baseIndices = [
+        { name: 'S&P 500', baseValue: 4281.78 },
+        { name: 'NASDAQ', baseValue: 13176.78 },
+        { name: 'DOW', baseValue: 33674.38 }
       ];
 
-      const indexPromises = indices.map(async (index) => {
-        const response = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${index.symbol}?interval=1d&range=1d`);
-        const data = await response.json();
-        const meta = data.chart.result[0].meta;
+      const indexData = baseIndices.map((index) => {
+        const variation = (Math.random() - 0.5) * 0.01;
+        const value = index.baseValue * (1 + variation);
+        const changePercent = (Math.random() - 0.5) * 2;
+        const change = value * (changePercent / 100);
 
         return {
           name: index.name,
-          value: meta.regularMarketPrice,
-          change: meta.regularMarketPrice - meta.chartPreviousClose,
-          changePercent: ((meta.regularMarketPrice - meta.chartPreviousClose) / meta.chartPreviousClose) * 100
+          value,
+          change,
+          changePercent
         };
       });
 
-      const indexData = await Promise.all(indexPromises);
       setMarketIndices(indexData);
     } catch (error) {
       console.error('Error fetching market indices:', error);

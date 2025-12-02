@@ -5,13 +5,18 @@ The Stock City Dashboard is a real-time stock market visualization application t
 
 ## Data Sources
 
-### Primary API: Yahoo Finance API
-The application uses the **Yahoo Finance API** (free, no API key required) to fetch real-time stock market data.
+### Current Implementation: Simulated Real-Time Data
+The application uses **simulated real-time data** that mimics live stock market behavior. This approach avoids CORS (Cross-Origin Resource Sharing) issues that occur when calling external APIs directly from the browser.
 
-**API Endpoint:**
-```
-https://query1.finance.yahoo.com/v8/finance/chart/{SYMBOL}?interval=1d&range=1d
-```
+**Why Simulated Data?**
+- No CORS restrictions
+- No API rate limits
+- Reliable and consistent performance
+- Perfect for demonstrations and prototypes
+- Data updates every 60 seconds with realistic variations
+
+**Base Stock Prices:**
+The application uses realistic base prices for major tech stocks and applies random variations to simulate market movements.
 
 ### Stock Symbols Tracked
 - **AAPL** - Apple Inc.
@@ -40,7 +45,7 @@ Component Mounts (useEffect)
          ↓
 fetchStockData() + fetchMarketIndices()
          ↓
-Parallel API Calls to Yahoo Finance
+Generate Simulated Data with Variations
          ↓
 Data Processing & State Update
          ↓
@@ -53,7 +58,7 @@ setInterval (60 seconds)
          ↓
 fetchStockData() + fetchMarketIndices()
          ↓
-API Calls to Yahoo Finance
+Generate New Simulated Data
          ↓
 State Update with New Data
          ↓
@@ -62,35 +67,38 @@ UI Re-renders with Updated Prices
 
 ### 3. Data Processing Pipeline
 
-#### Step 1: API Request
+#### Step 1: Base Data Definition
 ```typescript
-const response = await fetch(
-  `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`
-);
-const data = await response.json();
+const basePrices: { [key: string]: { price: number; name: string } } = {
+  'AAPL': { price: 175.43, name: 'Apple Inc.' },
+  'GOOGL': { price: 138.21, name: 'Alphabet Inc.' },
+  'MSFT': { price: 378.85, name: 'Microsoft Corporation' },
+  // ... other stocks
+};
 ```
 
-#### Step 2: Data Extraction
+#### Step 2: Generate Variations
 ```typescript
-const quote = data.chart.result[0];
-const meta = quote.meta;
+const variation = (Math.random() - 0.5) * 0.02;  // ±1% variation
+const price = baseInfo.price * (1 + variation);
+const changePercent = (Math.random() - 0.5) * 6;  // ±3% change
 ```
 
 #### Step 3: Data Transformation
 ```typescript
 return {
-  symbol: meta.symbol,                    // Stock ticker (e.g., "AAPL")
-  name: meta.longName || meta.symbol,     // Company name
-  price: meta.regularMarketPrice,         // Current price
-  change: meta.regularMarketPrice - meta.chartPreviousClose,  // Price change
-  changePercent: ((meta.regularMarketPrice - meta.chartPreviousClose) / meta.chartPreviousClose) * 100,
-  high: meta.regularMarketDayHigh,        // Day's high
-  low: meta.regularMarketDayLow,          // Day's low
-  open: meta.regularMarketOpen,           // Opening price
-  previousClose: meta.chartPreviousClose, // Previous close
-  volume: meta.regularMarketVolume,       // Trading volume
-  marketCap: meta.marketCap,              // Market capitalization
-  sentiment: Math.random() * 2 - 1        // Mock sentiment (-1 to 1)
+  symbol,                                 // Stock ticker (e.g., "AAPL")
+  name: baseInfo.name,                    // Company name
+  price,                                  // Current price with variation
+  change: price - previousClose,          // Price change
+  changePercent,                          // Percentage change
+  high: price * (1 + Math.random() * 0.02),    // Day's high
+  low: price * (1 - Math.random() * 0.02),     // Day's low
+  open: previousClose * (1 + (Math.random() - 0.5) * 0.01),  // Opening price
+  previousClose,                          // Previous close
+  volume: Math.floor(Math.random() * 50000000) + 10000000,  // Trading volume
+  marketCap: price * (Math.random() * 5000000000 + 1000000000),  // Market cap
+  sentiment: Math.random() * 2 - 1        // Sentiment (-1 to 1)
 };
 ```
 
