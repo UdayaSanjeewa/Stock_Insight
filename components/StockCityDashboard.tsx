@@ -10,6 +10,8 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 
 const StockCity3D = dynamic(() => import('./StockCity3D'), { ssr: false });
+const StockChart3D = dynamic(() => import('./StockChart3D'), { ssr: false });
+const VolumeChart3D = dynamic(() => import('./VolumeChart3D'), { ssr: false });
 
 interface StockData {
   symbol: string;
@@ -44,6 +46,7 @@ export function StockCityDashboard() {
   const [sentiment, setSentiment] = useState([50]);
   const [priceRange, setPriceRange] = useState([0, 500]);
   const [cityView, setCityView] = useState(true);
+  const [chartView, setChartView] = useState<'city' | 'volume'>('city');
   const [currentTime, setCurrentTime] = useState(new Date());
 
   const stockSymbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NVDA', 'NFLX'];
@@ -236,6 +239,19 @@ export function StockCityDashboard() {
           </div>
 
           <div>
+            <Label className="text-sm font-medium mb-2 block">Chart Display</Label>
+            <Select value={chartView} onValueChange={(v) => setChartView(v as 'city' | 'volume')}>
+              <SelectTrigger className="bg-slate-700 border-slate-600">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="city">3D City View</SelectItem>
+                <SelectItem value="volume">Volume Comparison</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
             <Label className="text-sm font-medium mb-2 block">Real-Time</Label>
             <div className="text-xs text-emerald-400">● Live Updates Active</div>
           </div>
@@ -244,17 +260,21 @@ export function StockCityDashboard() {
         <main className="flex-1 flex flex-col relative">
           <div className="flex-1 relative overflow-hidden bg-gradient-to-b from-slate-900 to-slate-950">
             <div className="absolute inset-0">
-              <StockCity3D
-                stocks={stocks}
-                selectedStock={selectedStock}
-                onSelectStock={(stock) => setSelectedStock(stock)}
-              />
+              {chartView === 'city' ? (
+                <StockCity3D
+                  stocks={stocks}
+                  selectedStock={selectedStock}
+                  onSelectStock={(stock) => setSelectedStock(stock)}
+                />
+              ) : (
+                <VolumeChart3D stocks={stocks} />
+              )}
             </div>
 
-            {/* Details Panel Overlay */}
+            {/* Details Panel Overlay with 3D Chart */}
             {selectedStock && (
-              <div className="absolute top-4 right-4 w-96 bg-slate-800/95 backdrop-blur-md border border-slate-700 rounded-xl shadow-2xl p-6">
-                <div className="space-y-4">
+              <div className="absolute top-4 right-4 w-[500px] bg-slate-800/95 backdrop-blur-md border border-slate-700 rounded-xl shadow-2xl overflow-hidden">
+                <div className="p-6 space-y-4 border-b border-slate-700">
                   <div className="flex items-baseline gap-3">
                     <div className="text-3xl font-bold">{selectedStock.symbol}</div>
                     <div className={`text-lg font-medium ${selectedStock.changePercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
@@ -266,23 +286,7 @@ export function StockCityDashboard() {
                     ${selectedStock.price.toFixed(2)}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 pt-3 border-t border-slate-700">
-                    <div>
-                      <div className="text-xs text-slate-400 mb-1">High</div>
-                      <div className="font-semibold text-green-400">${selectedStock.high.toFixed(2)}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-slate-400 mb-1">Low</div>
-                      <div className="font-semibold text-red-400">${selectedStock.low.toFixed(2)}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-slate-400 mb-1">Open</div>
-                      <div className="font-semibold">${selectedStock.open.toFixed(2)}</div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-slate-400 mb-1">Prev Close</div>
-                      <div className="font-semibold">${selectedStock.previousClose.toFixed(2)}</div>
-                    </div>
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
                       <div className="text-xs text-slate-400 mb-1">Volume</div>
                       <div className="font-semibold text-sm">{formatNumber(selectedStock.volume)}</div>
@@ -294,10 +298,15 @@ export function StockCityDashboard() {
                       </div>
                     )}
                   </div>
-                  <div className="pt-3 border-t border-slate-700">
+                  <div>
                     <div className="text-xs text-slate-400 mb-1">Name</div>
-                    <div className="font-semibold">{selectedStock.name}</div>
+                    <div className="font-semibold text-sm">{selectedStock.name}</div>
                   </div>
+                </div>
+
+                {/* 3D Chart Section */}
+                <div className="h-[400px] bg-slate-900/50 p-4">
+                  <StockChart3D stock={selectedStock} />
                 </div>
               </div>
             )}
