@@ -1,9 +1,5 @@
 'use client';
 
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera, Environment } from '@react-three/drei';
-import Building3D from './Building3D';
-
 interface StockData {
   symbol: string;
   name: string;
@@ -29,74 +25,134 @@ interface StockCity3DProps {
 
 export default function StockCity3D({ stocks, selectedStock, onSelectStock }: StockCity3DProps) {
   const getBuildingHeight = (price: number): number => {
-    return Math.max(1, Math.min(8, price / 50));
+    return Math.max(150, Math.min(450, price * 1.5));
   };
 
   const getBuildingColor = (changePercent: number): string => {
-    if (changePercent >= 2) return '#10b981';
-    if (changePercent >= 0) return '#34d399';
-    if (changePercent >= -2) return '#ef4444';
-    return '#dc2626';
+    if (changePercent >= 2) return 'from-emerald-500 to-emerald-700';
+    if (changePercent >= 0) return 'from-emerald-400 to-emerald-600';
+    if (changePercent >= -2) return 'from-red-500 to-red-700';
+    return 'from-red-600 to-red-800';
   };
 
   return (
-    <Canvas
-      shadows
-      gl={{ antialias: true, alpha: true }}
-      style={{ background: 'transparent' }}
-    >
-      <PerspectiveCamera makeDefault position={[0, 8, 15]} fov={50} />
-      <OrbitControls
-        enablePan={false}
-        enableZoom={true}
-        enableRotate={true}
-        minPolarAngle={Math.PI / 6}
-        maxPolarAngle={Math.PI / 2.5}
-        minDistance={10}
-        maxDistance={25}
-        target={[0, 2, 0]}
-      />
+    <div className="w-full h-full flex items-end justify-center pb-24" style={{ perspective: '1200px' }}>
+      <div className="flex items-end gap-12" style={{ transformStyle: 'preserve-3d' }}>
+        {stocks.map((stock, index) => {
+          const height = getBuildingHeight(stock.price);
+          const colorClass = getBuildingColor(stock.changePercent);
+          const isSelected = selectedStock?.symbol === stock.symbol;
+          const rotateY = (index - stocks.length / 2) * 5;
 
-      <ambientLight intensity={0.4} />
-      <directionalLight
-        position={[10, 10, 5]}
-        intensity={1}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-      />
-      <pointLight position={[-10, 10, -10]} intensity={0.5} color="#60a5fa" />
-      <pointLight position={[10, 5, 10]} intensity={0.3} color="#f59e0b" />
+          return (
+            <div
+              key={stock.symbol}
+              className="relative cursor-pointer transition-all duration-500"
+              style={{
+                height: `${height}px`,
+                width: '100px',
+                transformStyle: 'preserve-3d',
+                transform: `rotateY(${rotateY}deg) ${isSelected ? 'translateY(-20px)' : ''}`,
+              }}
+              onClick={() => onSelectStock(stock)}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = `rotateY(${rotateY}deg) translateY(-15px)`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = `rotateY(${rotateY}deg) ${isSelected ? 'translateY(-20px)' : ''}`;
+              }}
+            >
+              <div
+                className="absolute inset-0"
+                style={{ transformStyle: 'preserve-3d' }}
+              >
+                <div
+                  className={`absolute inset-0 bg-gradient-to-b ${colorClass} rounded-t-xl ${
+                    isSelected ? 'ring-4 ring-blue-400' : ''
+                  }`}
+                  style={{
+                    transform: 'translateZ(50px)',
+                    boxShadow: isSelected
+                      ? '0 0 60px rgba(59, 130, 246, 0.9), 0 30px 80px rgba(0, 0, 0, 0.8)'
+                      : '0 20px 60px rgba(0, 0, 0, 0.7)',
+                  }}
+                >
+                  <div className="absolute inset-0 p-2">
+                    <div className="grid grid-cols-3 gap-1 h-full">
+                      {Array.from({ length: Math.floor(height / 30) * 3 }).map((_, i) => (
+                        <div
+                          key={i}
+                          className="bg-yellow-200/30 rounded-sm"
+                          style={{ height: '12px', marginBottom: '4px' }}
+                        />
+                      ))}
+                    </div>
+                  </div>
 
-      <Environment preset="night" />
+                  <div className="absolute top-6 left-0 right-0 text-center z-10">
+                    <div className="bg-slate-900/80 backdrop-blur-sm px-3 py-2 inline-block rounded-lg border border-white/20">
+                      <div className="text-white font-bold text-xl">{stock.symbol}</div>
+                    </div>
+                  </div>
 
-      {stocks.map((stock, index) => {
-        const height = getBuildingHeight(stock.price);
-        const color = getBuildingColor(stock.changePercent);
-        const xPosition = (index - stocks.length / 2) * 2.5;
-        const isSelected = selectedStock?.symbol === stock.symbol;
+                  <div className="absolute bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur-sm p-3 text-center rounded-b-xl">
+                    <div className="text-white text-base font-semibold">
+                      ${stock.price.toFixed(2)}
+                    </div>
+                    <div className={`text-sm font-medium ${stock.changePercent >= 0 ? 'text-emerald-300' : 'text-red-300'}`}>
+                      {stock.changePercent >= 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
+                    </div>
+                  </div>
+                </div>
 
-        return (
-          <Building3D
-            key={stock.symbol}
-            position={[xPosition, height / 2, 0]}
-            height={height}
-            color={color}
-            symbol={stock.symbol}
-            price={stock.price}
-            changePercent={stock.changePercent}
-            isSelected={isSelected}
-            onClick={() => onSelectStock(stock)}
-          />
-        );
-      })}
+                <div
+                  className={`absolute top-0 left-full h-full bg-gradient-to-b ${colorClass}`}
+                  style={{
+                    width: '100px',
+                    transform: 'rotateY(90deg)',
+                    transformOrigin: 'left',
+                    filter: 'brightness(0.6)',
+                    borderRadius: '0 12px 0 0',
+                  }}
+                >
+                  <div className="absolute inset-0 p-2">
+                    <div className="grid grid-cols-2 gap-1 h-full">
+                      {Array.from({ length: Math.floor(height / 35) * 2 }).map((_, i) => (
+                        <div
+                          key={i}
+                          className="bg-yellow-200/20 rounded-sm"
+                          style={{ height: '10px', marginBottom: '4px' }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
 
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]} receiveShadow>
-        <planeGeometry args={[50, 50]} />
-        <meshStandardMaterial color="#0f172a" metalness={0.2} roughness={0.8} />
-      </mesh>
+                <div
+                  className={`absolute top-0 left-0 right-0 bg-gradient-to-br ${colorClass}`}
+                  style={{
+                    height: '100px',
+                    transform: 'rotateX(90deg)',
+                    transformOrigin: 'top',
+                    filter: 'brightness(0.8)',
+                    borderRadius: '12px',
+                  }}
+                />
+              </div>
 
-      <fog attach="fog" args={['#0f172a', 10, 30]} />
-    </Canvas>
+              <div
+                className="absolute left-1/2 bg-black/50 blur-2xl rounded-full"
+                style={{
+                  bottom: '-10px',
+                  width: '120%',
+                  height: '30px',
+                  transform: 'translateX(-50%)',
+                }}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
