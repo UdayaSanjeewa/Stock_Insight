@@ -370,7 +370,7 @@ function TieredBuilding({ height, color, isHovered, label, value, secondaryLabel
 
 function BuildingLabel({ label, value, secondaryLabel }: any) {
   return (
-    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center" style={{ transform: 'translateZ(50px) translateY(70px)' }}>
+    <div className="absolute top-0 left-1/2 -translate-x-1/2 text-center" style={{ transform: 'translateZ(50px) translateY(-70px)' }}>
       <div className="bg-slate-800/95 backdrop-blur-sm px-3 py-2 rounded-lg border border-slate-600 shadow-xl whitespace-nowrap">
         <div className="text-white font-bold text-sm">{label}</div>
         {secondaryLabel && <div className="text-slate-300 text-xs mt-0.5 truncate max-w-[100px]">{secondaryLabel}</div>}
