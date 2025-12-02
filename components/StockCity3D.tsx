@@ -36,8 +36,15 @@ export default function StockCity3D({ stocks, selectedStock, onSelectStock }: St
   };
 
   return (
-    <div className="w-full h-full flex items-center justify-center" style={{ perspective: '1500px' }}>
-      <div className="flex items-end gap-8" style={{ transformStyle: 'preserve-3d', height: '500px' }}>
+    <div className="w-full h-full flex items-center justify-center" style={{ perspective: '2000px' }}>
+      <div
+        className="flex items-end gap-8"
+        style={{
+          transformStyle: 'preserve-3d',
+          height: '500px',
+          transform: 'rotateX(8deg) rotateY(-5deg)'
+        }}
+      >
         {stocks.map((stock, index) => {
           const height = getBuildingHeight(stock.price);
           const colorClass = getBuildingColor(stock.changePercent);
@@ -51,15 +58,15 @@ export default function StockCity3D({ stocks, selectedStock, onSelectStock }: St
                 height: `${height}px`,
                 width: '90px',
                 transformStyle: 'preserve-3d',
-                transform: `rotateY(15deg) ${isSelected ? 'translateY(-20px)' : 'translateY(0)'}`,
+                transform: `rotateY(25deg) ${isSelected ? 'translateY(-20px)' : 'translateY(0)'}`,
                 alignSelf: 'flex-end'
               }}
               onClick={() => onSelectStock(stock)}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = `rotateY(15deg) translateY(-15px)`;
+                e.currentTarget.style.transform = `rotateY(25deg) translateY(-15px)`;
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = `rotateY(15deg) ${isSelected ? 'translateY(-20px)' : ''}`;
+                e.currentTarget.style.transform = `rotateY(25deg) ${isSelected ? 'translateY(-20px)' : ''}`;
               }}
             >
               <div
