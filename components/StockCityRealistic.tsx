@@ -54,13 +54,13 @@ export default function StockCityRealistic({ data, title, maxValue }: StockCityR
 
   return (
     <div className="w-full h-full flex flex-col">
-      <div className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-slate-200 to-slate-400 bg-clip-text text-transparent">
+      <div className="text-2xl font-bold mb-4 text-center bg-gradient-to-r from-slate-200 to-slate-400 bg-clip-text text-transparent">
         {title}
       </div>
 
       <div
-        className="flex-1 flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-slate-800 via-slate-900 to-slate-950 rounded-2xl"
-        style={{ perspective: '2500px' }}
+        className="flex-1 flex items-center justify-center relative bg-gradient-to-b from-slate-800 via-slate-900 to-slate-950 rounded-2xl"
+        style={{ perspective: '2500px', overflow: 'visible' }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -70,7 +70,7 @@ export default function StockCityRealistic({ data, title, maxValue }: StockCityR
           className="relative transition-transform duration-200"
           style={{
             transformStyle: 'preserve-3d',
-            transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
+            transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) translateY(-50px)`,
             cursor: isDragging ? 'grabbing' : 'grab',
           }}
         >
@@ -80,7 +80,7 @@ export default function StockCityRealistic({ data, title, maxValue }: StockCityR
             style={{
               width: '800px',
               height: '800px',
-              transform: 'translateZ(-20px) translateY(300px)',
+              transform: 'translateZ(-20px) translateY(220px)',
               transformStyle: 'preserve-3d',
               left: '50%',
               marginLeft: '-400px',
@@ -126,9 +126,9 @@ export default function StockCityRealistic({ data, title, maxValue }: StockCityR
           </div>
 
           {/* Buildings */}
-          <div className="flex items-end justify-center gap-6" style={{ transformStyle: 'preserve-3d', height: '500px' }}>
+          <div className="flex items-end justify-center gap-6" style={{ transformStyle: 'preserve-3d', height: '400px' }}>
             {data.map((item, index) => {
-              const baseHeight = (item.value / max) * 350 + 100;
+              const baseHeight = (item.value / max) * 300 + 80;
               const style = getBuildingStyle(index);
               const isHovered = hoveredIndex === index;
               const angle = (index - data.length / 2) * 8;
@@ -370,8 +370,8 @@ function TieredBuilding({ height, color, isHovered, label, value, secondaryLabel
 
 function BuildingLabel({ label, value, secondaryLabel }: any) {
   return (
-    <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 text-center" style={{ transform: 'translateZ(50px)' }}>
-      <div className="bg-slate-800/95 backdrop-blur-sm px-3 py-2 rounded-lg border border-slate-600 shadow-xl">
+    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center" style={{ transform: 'translateZ(50px) translateY(70px)' }}>
+      <div className="bg-slate-800/95 backdrop-blur-sm px-3 py-2 rounded-lg border border-slate-600 shadow-xl whitespace-nowrap">
         <div className="text-white font-bold text-sm">{label}</div>
         {secondaryLabel && <div className="text-slate-300 text-xs mt-0.5 truncate max-w-[100px]">{secondaryLabel}</div>}
         <div className="text-emerald-400 font-semibold text-xs mt-1">${value.toFixed(2)}</div>
