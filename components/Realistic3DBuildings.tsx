@@ -150,7 +150,6 @@ function Building({
         anchorY="middle"
         outlineWidth={0.02}
         outlineColor="#000000"
-        font="/fonts/inter-bold.woff"
       >
         {label}
       </Text>
@@ -163,7 +162,6 @@ function Building({
         anchorY="middle"
         outlineWidth={0.015}
         outlineColor="#000000"
-        font="/fonts/inter-regular.woff"
       >
         ${value.toFixed(2)}
       </Text>
@@ -176,7 +174,6 @@ function Building({
         anchorY="middle"
         outlineWidth={0.012}
         outlineColor="#000000"
-        font="/fonts/inter-bold.woff"
       >
         {change >= 0 ? '+' : ''}{change.toFixed(2)}%
       </Text>
