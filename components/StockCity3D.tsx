@@ -36,13 +36,13 @@ export default function StockCity3D({ stocks, selectedStock, onSelectStock }: St
   };
 
   return (
-    <div className="w-full h-full flex items-end justify-center pb-24" style={{ perspective: '1200px' }}>
-      <div className="flex items-end gap-12" style={{ transformStyle: 'preserve-3d' }}>
+    <div className="w-full h-full flex items-center justify-center" style={{ perspective: '1500px' }}>
+      <div className="flex items-end gap-8" style={{ transformStyle: 'preserve-3d', height: '500px' }}>
         {stocks.map((stock, index) => {
           const height = getBuildingHeight(stock.price);
           const colorClass = getBuildingColor(stock.changePercent);
           const isSelected = selectedStock?.symbol === stock.symbol;
-          const rotateY = (index - stocks.length / 2) * 5;
+          const rotateY = (index - stocks.length / 2) * 4;
 
           return (
             <div
@@ -50,9 +50,10 @@ export default function StockCity3D({ stocks, selectedStock, onSelectStock }: St
               className="relative cursor-pointer transition-all duration-500"
               style={{
                 height: `${height}px`,
-                width: '100px',
+                width: '90px',
                 transformStyle: 'preserve-3d',
-                transform: `rotateY(${rotateY}deg) ${isSelected ? 'translateY(-20px)' : ''}`,
+                transform: `rotateY(${rotateY}deg) ${isSelected ? 'translateY(-20px)' : 'translateY(0)'}`,
+                alignSelf: 'flex-end'
               }}
               onClick={() => onSelectStock(stock)}
               onMouseEnter={(e) => {
@@ -71,7 +72,7 @@ export default function StockCity3D({ stocks, selectedStock, onSelectStock }: St
                     isSelected ? 'ring-4 ring-blue-400' : ''
                   }`}
                   style={{
-                    transform: 'translateZ(50px)',
+                    transform: 'translateZ(45px)',
                     boxShadow: isSelected
                       ? '0 0 60px rgba(59, 130, 246, 0.9), 0 30px 80px rgba(0, 0, 0, 0.8)'
                       : '0 20px 60px rgba(0, 0, 0, 0.7)',
@@ -108,7 +109,7 @@ export default function StockCity3D({ stocks, selectedStock, onSelectStock }: St
                 <div
                   className={`absolute top-0 left-full h-full bg-gradient-to-b ${colorClass}`}
                   style={{
-                    width: '100px',
+                    width: '90px',
                     transform: 'rotateY(90deg)',
                     transformOrigin: 'left',
                     filter: 'brightness(0.6)',
@@ -131,7 +132,7 @@ export default function StockCity3D({ stocks, selectedStock, onSelectStock }: St
                 <div
                   className={`absolute top-0 left-0 right-0 bg-gradient-to-br ${colorClass}`}
                   style={{
-                    height: '100px',
+                    height: '90px',
                     transform: 'rotateX(90deg)',
                     transformOrigin: 'top',
                     filter: 'brightness(0.8)',

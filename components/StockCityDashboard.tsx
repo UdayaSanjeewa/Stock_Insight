@@ -250,6 +250,57 @@ export function StockCityDashboard() {
                 onSelectStock={(stock) => setSelectedStock(stock)}
               />
             </div>
+
+            {/* Details Panel Overlay */}
+            {selectedStock && (
+              <div className="absolute top-4 right-4 w-96 bg-slate-800/95 backdrop-blur-md border border-slate-700 rounded-xl shadow-2xl p-6">
+                <div className="space-y-4">
+                  <div className="flex items-baseline gap-3">
+                    <div className="text-3xl font-bold">{selectedStock.symbol}</div>
+                    <div className={`text-lg font-medium ${selectedStock.changePercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {selectedStock.changePercent >= 0 ? <TrendingUp className="inline w-4 h-4 mr-1" /> : <TrendingDown className="inline w-4 h-4 mr-1" />}
+                      {selectedStock.changePercent >= 0 ? '+' : ''}{selectedStock.changePercent.toFixed(2)}%
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold">
+                    ${selectedStock.price.toFixed(2)}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 pt-3 border-t border-slate-700">
+                    <div>
+                      <div className="text-xs text-slate-400 mb-1">High</div>
+                      <div className="font-semibold text-green-400">${selectedStock.high.toFixed(2)}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-400 mb-1">Low</div>
+                      <div className="font-semibold text-red-400">${selectedStock.low.toFixed(2)}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-400 mb-1">Open</div>
+                      <div className="font-semibold">${selectedStock.open.toFixed(2)}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-400 mb-1">Prev Close</div>
+                      <div className="font-semibold">${selectedStock.previousClose.toFixed(2)}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-400 mb-1">Volume</div>
+                      <div className="font-semibold text-sm">{formatNumber(selectedStock.volume)}</div>
+                    </div>
+                    {selectedStock.marketCap && (
+                      <div>
+                        <div className="text-xs text-slate-400 mb-1">Market Cap</div>
+                        <div className="font-semibold text-sm">${formatNumber(selectedStock.marketCap)}</div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="pt-3 border-t border-slate-700">
+                    <div className="text-xs text-slate-400 mb-1">Name</div>
+                    <div className="font-semibold">{selectedStock.name}</div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <footer className="bg-slate-800/80 backdrop-blur-sm border-t border-slate-700 px-12 py-6">
@@ -268,74 +319,8 @@ export function StockCityDashboard() {
             </div>
           </footer>
         </main>
-
-        {/* Details Panel at Bottom */}
-        <aside className="bg-slate-800/90 backdrop-blur-sm border-t border-slate-700">
-          {selectedStock ? (
-            <div className="px-8 py-4">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Stock Info */}
-                <div className="space-y-3">
-                  <div className="flex items-baseline gap-3">
-                    <div className="text-3xl font-bold">{selectedStock.symbol}</div>
-                    <div className={`text-lg font-medium ${selectedStock.changePercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {selectedStock.changePercent >= 0 ? <TrendingUp className="inline w-4 h-4 mr-1" /> : <TrendingDown className="inline w-4 h-4 mr-1" />}
-                      {selectedStock.changePercent >= 0 ? '+' : ''}{selectedStock.changePercent.toFixed(2)}%
-                    </div>
-                  </div>
-                  <div className="text-2xl font-bold">
-                    ${selectedStock.price.toFixed(2)}
-                  </div>
-                </div>
-
-                {/* Stats Grid */}
-                <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">High</div>
-                    <div className="font-semibold text-green-400">${selectedStock.high.toFixed(2)}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">Low</div>
-                    <div className="font-semibold text-red-400">${selectedStock.low.toFixed(2)}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">Open</div>
-                    <div className="font-semibold">${selectedStock.open.toFixed(2)}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">Prev Close</div>
-                    <div className="font-semibold">${selectedStock.previousClose.toFixed(2)}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">Volume</div>
-                    <div className="font-semibold">{formatNumber(selectedStock.volume)}</div>
-                  </div>
-                  {selectedStock.marketCap && (
-                    <div>
-                      <div className="text-xs text-slate-400 mb-1">Market Cap</div>
-                      <div className="font-semibold">${formatNumber(selectedStock.marketCap)}</div>
-                    </div>
-                  )}
-                  {selectedStock.sentiment !== undefined && (
-                    <div>
-                      <div className="text-xs text-slate-400 mb-1">Sentiment</div>
-                      <div className="font-semibold">{selectedStock.sentiment.toFixed(2)}</div>
-                    </div>
-                  )}
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">Name</div>
-                    <div className="font-semibold text-sm truncate">{selectedStock.name}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="px-8 py-4 text-center text-slate-400">
-              Click on a building to view stock details
-            </div>
-          )}
-        </aside>
       </div>
+
     </div>
   );
 }
