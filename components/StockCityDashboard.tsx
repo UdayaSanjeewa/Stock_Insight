@@ -244,7 +244,7 @@ export function StockCityDashboard() {
               <Cloud className="absolute top-20 left-32 w-24 h-24 text-slate-600 opacity-50" />
               <Cloud className="absolute top-32 right-48 w-32 h-32 text-slate-600 opacity-40" />
 
-              <div className="relative flex items-end justify-center gap-6" style={{ perspective: '1500px', transformStyle: 'preserve-3d' }}>
+              <div className="relative flex items-end justify-center gap-8" style={{ perspective: '2000px', perspectiveOrigin: 'center center' }}>
                 {stocks.map((stock, index) => {
                   const height = getBuildingHeight(stock.price);
                   const colorClass = getBuildingColor(stock.changePercent);
@@ -253,68 +253,102 @@ export function StockCityDashboard() {
                   return (
                     <div
                       key={stock.symbol}
-                      className="relative cursor-pointer transition-all duration-300 hover:translate-y-[-10px]"
+                      className="relative cursor-pointer transition-all duration-500 hover:-translate-y-4"
                       style={{
                         height: `${height}px`,
-                        transform: `rotateY(${index * 2 - 7}deg)`,
-                        transformStyle: 'preserve-3d'
+                        transformStyle: 'preserve-3d',
+                        transform: `rotateY(${(index - 3.5) * 8}deg) translateZ(0px)`
                       }}
                       onClick={() => setSelectedStock(stock)}
                     >
                       <div
-                        className={`w-28 h-full bg-gradient-to-b ${colorClass} rounded-t-lg relative overflow-hidden ${
-                          isSelected ? 'ring-4 ring-blue-500' : ''
-                        }`}
+                        className={`w-32 h-full relative`}
                         style={{
-                          boxShadow: `
-                            ${isSelected ? '0 0 30px rgba(59, 130, 246, 0.6),' : ''}
-                            20px 20px 60px rgba(0, 0, 0, 0.5),
-                            -10px -10px 30px rgba(255, 255, 255, 0.05),
-                            inset 5px 5px 10px rgba(255, 255, 255, 0.1)
-                          `,
-                          transform: 'translateZ(20px)'
+                          transformStyle: 'preserve-3d'
                         }}
                       >
-                        {/* Side panel for 3D effect */}
+                        {/* Front Face */}
                         <div
-                          className={`absolute top-0 right-0 h-full w-3 bg-gradient-to-r ${colorClass} opacity-40`}
+                          className={`absolute inset-0 bg-gradient-to-b ${colorClass} rounded-t-lg overflow-hidden ${
+                            isSelected ? 'ring-4 ring-blue-400' : ''
+                          }`}
                           style={{
-                            transform: 'rotateY(90deg) translateZ(12px)',
-                            transformOrigin: 'right',
-                            filter: 'brightness(0.6)'
+                            transform: 'translateZ(25px)',
+                            boxShadow: isSelected
+                              ? '0 0 40px rgba(59, 130, 246, 0.8), 0 20px 40px rgba(0, 0, 0, 0.6)'
+                              : '0 15px 35px rgba(0, 0, 0, 0.5), inset 0 -2px 8px rgba(0, 0, 0, 0.3)'
+                          }}
+                        >
+                          <div className="absolute inset-0 grid grid-cols-4 gap-1 p-2">
+                            {Array.from({ length: Math.floor(height / 20) }).map((_, i) => (
+                              <div
+                                key={i}
+                                className="bg-yellow-300/20 rounded-sm"
+                                style={{ height: '8px' }}
+                              />
+                            ))}
+                          </div>
+
+                          <div className="absolute top-4 left-0 right-0 text-center">
+                            <div className="bg-black/40 backdrop-blur-sm px-2 py-1 inline-block rounded">
+                              <div className="text-white font-bold text-lg">{stock.symbol}</div>
+                            </div>
+                          </div>
+
+                          <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm p-2 text-center">
+                            <div className="text-white text-sm font-medium">
+                              ${stock.price.toFixed(2)}
+                            </div>
+                            <div className={`text-xs ${stock.changePercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                              {stock.changePercent >= 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Right Side Face */}
+                        <div
+                          className={`absolute top-0 right-0 h-full bg-gradient-to-b ${colorClass}`}
+                          style={{
+                            width: '50px',
+                            transform: 'rotateY(90deg) translateZ(41px)',
+                            transformOrigin: 'left center',
+                            filter: 'brightness(0.7)',
+                            borderRadius: '0 8px 0 0',
+                            boxShadow: 'inset -5px 0 15px rgba(0, 0, 0, 0.4)'
+                          }}
+                        >
+                          {/* Side windows */}
+                          <div className="absolute inset-0 grid grid-cols-2 gap-1 p-2">
+                            {Array.from({ length: Math.floor(height / 25) }).map((_, i) => (
+                              <div
+                                key={i}
+                                className="bg-yellow-300/15 rounded-sm"
+                                style={{ height: '6px' }}
+                              />
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Top Face */}
+                        <div
+                          className={`absolute top-0 left-0 right-0 bg-gradient-to-br ${colorClass}`}
+                          style={{
+                            height: '50px',
+                            transform: 'rotateX(90deg) translateZ(0px)',
+                            transformOrigin: 'top center',
+                            filter: 'brightness(0.85)',
+                            borderRadius: '8px'
                           }}
                         />
-                        <div className="absolute inset-0 grid grid-cols-4 gap-1 p-2">
-                          {Array.from({ length: Math.floor(height / 20) }).map((_, i) => (
-                            <div
-                              key={i}
-                              className="bg-yellow-300/20 rounded-sm"
-                              style={{ height: '8px' }}
-                            />
-                          ))}
-                        </div>
-
-                        <div className="absolute top-4 left-0 right-0 text-center">
-                          <div className="bg-black/40 backdrop-blur-sm px-2 py-1 inline-block rounded">
-                            <div className="text-white font-bold text-lg">{stock.symbol}</div>
-                          </div>
-                        </div>
-
-                        <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm p-2 text-center">
-                          <div className="text-white text-sm font-medium">
-                            ${stock.price.toFixed(2)}
-                          </div>
-                          <div className={`text-xs ${stock.changePercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                            {stock.changePercent >= 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
-                          </div>
-                        </div>
                       </div>
 
-                      {/* 3D Base */}
+                      {/* Ground Shadow */}
                       <div
-                        className="absolute -bottom-2 left-0 right-0 h-2 bg-slate-900/80 rounded-b-sm"
+                        className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-black/60 blur-xl rounded-full"
                         style={{
-                          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.8)'
+                          width: '80%',
+                          height: '20px',
+                          transform: 'translateX(-50%) translateZ(-10px)'
                         }}
                       />
                     </div>
