@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAllStocks, useStockDataFromDB } from '@/hooks/useStockDataFromDB';
 import { RefreshCw, TrendingUp, TrendingDown, DollarSign, BarChart3 } from 'lucide-react';
+import { MarketOverviewCharts } from './MarketOverviewCharts';
 
 export function StockDataManager() {
   const { stocks, loading: stocksLoading, refreshData: refreshStocks } = useAllStocks();
@@ -66,6 +67,8 @@ export function StockDataManager() {
           {updating ? 'Updating...' : 'Update All Stocks'}
         </Button>
       </div>
+
+      <MarketOverviewCharts />
 
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
         {stocksLoading ? (
