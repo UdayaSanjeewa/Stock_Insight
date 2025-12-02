@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 
 const StockCity3D = dynamic(() => import('./StockCity3D'), { ssr: false });
+const StockCityRealistic = dynamic(() => import('./StockCityRealistic'), { ssr: false });
 const StockChart3D = dynamic(() => import('./StockChart3D'), { ssr: false });
 const VolumeChart3D = dynamic(() => import('./VolumeChart3D'), { ssr: false });
 
@@ -46,7 +47,7 @@ export function StockCityDashboard() {
   const [sentiment, setSentiment] = useState([50]);
   const [priceRange, setPriceRange] = useState([0, 500]);
   const [cityView, setCityView] = useState(true);
-  const [chartView, setChartView] = useState<'city' | 'volume' | 'analysis'>('city');
+  const [chartView, setChartView] = useState<'city' | 'realistic' | 'volume' | 'analysis'>('realistic');
   const [currentTime, setCurrentTime] = useState(new Date());
 
   const stockSymbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NVDA', 'NFLX'];
@@ -240,12 +241,13 @@ export function StockCityDashboard() {
 
           <div>
             <Label className="text-sm font-medium mb-2 block">Chart Display</Label>
-            <Select value={chartView} onValueChange={(v) => setChartView(v as 'city' | 'volume' | 'analysis')}>
+            <Select value={chartView} onValueChange={(v) => setChartView(v as 'city' | 'realistic' | 'volume' | 'analysis')}>
               <SelectTrigger className="bg-slate-700 border-slate-600">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="city">3D City View</SelectItem>
+                <SelectItem value="realistic">Realistic City</SelectItem>
                 <SelectItem value="volume">Volume Comparison</SelectItem>
                 <SelectItem value="analysis">Stock Analysis Grid</SelectItem>
               </SelectContent>
@@ -266,6 +268,17 @@ export function StockCityDashboard() {
                   stocks={stocks}
                   selectedStock={selectedStock}
                   onSelectStock={(stock) => setSelectedStock(stock)}
+                />
+              ) : chartView === 'realistic' ? (
+                <StockCityRealistic
+                  data={stocks.map(stock => ({
+                    label: stock.symbol,
+                    value: stock.price,
+                    color: stock.changePercent >= 0 ? 'from-emerald-500 to-emerald-700' : 'from-red-500 to-red-700',
+                    secondaryLabel: stock.name
+                  }))}
+                  title="Stock Market City"
+                  maxValue={Math.max(...stocks.map(s => s.price))}
                 />
               ) : chartView === 'volume' ? (
                 <VolumeChart3D stocks={stocks} />
@@ -298,7 +311,7 @@ export function StockCityDashboard() {
           </div>
 
           <footer className="bg-slate-800/80 backdrop-blur-sm border-t border-slate-700">
-            {selectedStock && chartView === 'city' ? (
+            {selectedStock && (chartView === 'city' || chartView === 'realistic') ? (
               <div className="px-8 py-4">
                 <div className="flex items-start gap-8">
                   {/* Stock Details Section */}
