@@ -203,26 +203,42 @@ export default function Chart3D({ data, title, maxValue, height = 400 }: Chart3D
                   <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent rounded-lg" />
                 </div>
 
-                {/* Label at bottom */}
+                {/* Label above bar */}
+                <div
+                  className="absolute text-center"
+                  style={{
+                    width: `${barWidth * 2}px`,
+                    left: `${-barWidth / 2}px`,
+                    bottom: `${barHeight + 15}px`,
+                    transformStyle: 'preserve-3d',
+                    transform: 'translateZ(50px)',
+                  }}
+                >
+                  <div className="inline-block space-y-1">
+                    <div className="text-white font-bold text-base bg-slate-800/90 backdrop-blur-sm px-3 py-1.5 rounded shadow-lg border border-slate-600">
+                      {item.label}
+                    </div>
+                    {item.secondaryLabel && (
+                      <div className="text-slate-200 text-xs bg-slate-700/80 backdrop-blur-sm px-2 py-1 rounded shadow-md max-w-[150px] mx-auto line-clamp-1">
+                        {item.secondaryLabel}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Symbol label on floor */}
                 <div
                   className="absolute text-center whitespace-nowrap"
                   style={{
-                    width: `${barWidth * 3}px`,
-                    left: `${-barWidth}px`,
+                    width: `${barWidth * 2}px`,
+                    left: `${-barWidth / 2}px`,
                     top: `${barHeight + 20}px`,
                     transform: 'rotateX(90deg)',
                     transformOrigin: 'top',
                   }}
                 >
-                  <div className="inline-block">
-                    <div className="text-white font-bold text-sm bg-slate-800/80 backdrop-blur-sm px-2 py-1 rounded mb-1">
-                      {item.label}
-                    </div>
-                    {item.secondaryLabel && (
-                      <div className="text-slate-300 text-xs bg-slate-800/60 backdrop-blur-sm px-2 py-0.5 rounded">
-                        {item.secondaryLabel}
-                      </div>
-                    )}
+                  <div className="text-slate-400 font-semibold text-xs bg-slate-800/60 backdrop-blur-sm px-2 py-0.5 rounded">
+                    {item.label}
                   </div>
                 </div>
 
