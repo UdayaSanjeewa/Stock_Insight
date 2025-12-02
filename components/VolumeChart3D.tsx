@@ -32,7 +32,8 @@ export default function VolumeChart3D({ stocks }: VolumeChart3DProps) {
         label: stock.symbol,
         value: stock.volume / 1000000, // Convert to millions
         color: getColor(),
-        sublabel: `${(stock.volume / 1000000).toFixed(1)}M`
+        sublabel: `${(stock.volume / 1000000).toFixed(1)}M`,
+        secondaryLabel: stock.name
       };
     });
   }, [stocks]);

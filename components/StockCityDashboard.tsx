@@ -295,62 +295,80 @@ export function StockCityDashboard() {
               )}
             </div>
 
-            {/* Compact Details Panel - Bottom Left */}
-            {selectedStock && chartView === 'city' && (
-              <div className="absolute bottom-4 left-4 w-80 bg-slate-800/95 backdrop-blur-md border border-slate-700 rounded-xl shadow-2xl p-4">
-                <div className="flex items-baseline gap-2 mb-2">
-                  <div className="text-2xl font-bold">{selectedStock.symbol}</div>
-                  <div className={`text-sm font-medium ${selectedStock.changePercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {selectedStock.changePercent >= 0 ? <TrendingUp className="inline w-3 h-3 mr-1" /> : <TrendingDown className="inline w-3 h-3 mr-1" />}
-                    {selectedStock.changePercent >= 0 ? '+' : ''}{selectedStock.changePercent.toFixed(2)}%
-                  </div>
-                </div>
-                <div className="text-xl font-bold mb-3">
-                  ${selectedStock.price.toFixed(2)}
-                </div>
+          </div>
 
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div>
-                    <div className="text-xs text-slate-400">High</div>
-                    <div className="font-semibold text-green-400">${selectedStock.high.toFixed(2)}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-slate-400">Low</div>
-                    <div className="font-semibold text-red-400">${selectedStock.low.toFixed(2)}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-slate-400">Volume</div>
-                    <div className="font-semibold text-xs">{formatNumber(selectedStock.volume)}</div>
-                  </div>
-                  {selectedStock.marketCap && (
-                    <div>
-                      <div className="text-xs text-slate-400">Market Cap</div>
-                      <div className="font-semibold text-xs">${formatNumber(selectedStock.marketCap)}</div>
+          <footer className="bg-slate-800/80 backdrop-blur-sm border-t border-slate-700">
+            {selectedStock && chartView === 'city' ? (
+              <div className="px-8 py-4">
+                <div className="flex items-start gap-8">
+                  {/* Stock Details Section */}
+                  <div className="flex-1">
+                    <div className="flex items-baseline gap-3 mb-2">
+                      <div className="text-3xl font-bold">{selectedStock.symbol}</div>
+                      <div className={`text-lg font-medium ${selectedStock.changePercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {selectedStock.changePercent >= 0 ? <TrendingUp className="inline w-4 h-4 mr-1" /> : <TrendingDown className="inline w-4 h-4 mr-1" />}
+                        {selectedStock.changePercent >= 0 ? '+' : ''}{selectedStock.changePercent.toFixed(2)}%
+                      </div>
                     </div>
-                  )}
+                    <div className="text-2xl font-bold mb-3">
+                      ${selectedStock.price.toFixed(2)}
+                    </div>
+                    <div className="grid grid-cols-4 gap-4 text-sm">
+                      <div>
+                        <div className="text-xs text-slate-400 mb-1">High</div>
+                        <div className="font-semibold text-green-400">${selectedStock.high.toFixed(2)}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-slate-400 mb-1">Low</div>
+                        <div className="font-semibold text-red-400">${selectedStock.low.toFixed(2)}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-slate-400 mb-1">Volume</div>
+                        <div className="font-semibold text-xs">{formatNumber(selectedStock.volume)}</div>
+                      </div>
+                      {selectedStock.marketCap && (
+                        <div>
+                          <div className="text-xs text-slate-400 mb-1">Market Cap</div>
+                          <div className="font-semibold text-xs">${formatNumber(selectedStock.marketCap)}</div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="mt-3 text-xs text-slate-400">{selectedStock.name}</div>
+                  </div>
+
+                  {/* Market Indices Section */}
+                  <div className="flex gap-8">
+                    {marketIndices.map((index) => (
+                      <div key={index.name} className="text-center">
+                        <div className="text-xs font-medium text-slate-400 mb-1">{index.name}</div>
+                        <div className="text-lg font-bold mb-1">
+                          {index.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </div>
+                        <div className={`text-xs font-medium ${index.changePercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                          {index.changePercent >= 0 ? '+' : ''}{index.changePercent.toFixed(2)}%
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="mt-3 pt-3 border-t border-slate-700">
-                  <div className="text-xs text-slate-400">Company</div>
-                  <div className="font-semibold text-xs">{selectedStock.name}</div>
+              </div>
+            ) : (
+              <div className="px-12 py-6">
+                <div className="flex items-center justify-between gap-12">
+                  {marketIndices.map((index) => (
+                    <div key={index.name} className="flex-1 text-center">
+                      <div className="text-sm font-medium text-slate-400 mb-1">{index.name}</div>
+                      <div className="text-2xl font-bold mb-1">
+                        {index.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </div>
+                      <div className={`text-sm font-medium ${index.changePercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {index.changePercent >= 0 ? '+' : ''}{index.changePercent.toFixed(2)}%
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
-          </div>
-
-          <footer className="bg-slate-800/80 backdrop-blur-sm border-t border-slate-700 px-12 py-6">
-            <div className="flex items-center justify-between gap-12">
-              {marketIndices.map((index) => (
-                <div key={index.name} className="flex-1 text-center">
-                  <div className="text-sm font-medium text-slate-400 mb-1">{index.name}</div>
-                  <div className="text-2xl font-bold mb-1">
-                    {index.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </div>
-                  <div className={`text-sm font-medium ${index.changePercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {index.changePercent >= 0 ? '+' : ''}{index.changePercent.toFixed(2)}%
-                  </div>
-                </div>
-              ))}
-            </div>
           </footer>
         </main>
       </div>
