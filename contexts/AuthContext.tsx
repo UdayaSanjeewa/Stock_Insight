@@ -4,12 +4,19 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 
+interface UserProfile {
+  name: string;
+  address: string;
+  age: number;
+  phoneNumber: string;
+}
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, profile: UserProfile) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
 
@@ -47,12 +54,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error };
   };
 
-  const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
+  const signUp = async (email: string, password: string, profile: UserProfile) => {
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: undefined,
+      },
     });
-    return { error };
+
+    if (error) {
+      return { error };
+    }
+
+    if (data.user) {
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .insert({
+          id: data.user.id,
+          name: profile.name,
+          address: profile.address,
+          age: profile.age,
+          phone_number: profile.phoneNumber,
+        });
+
+      if (profileError) {
+        return { error: profileError };
+      }
+    }
+
+    return { error: null };
   };
 
   const signOut = async () => {

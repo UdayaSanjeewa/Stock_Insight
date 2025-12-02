@@ -10,11 +10,24 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export function LandingPage() {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    address: '',
+    age: '',
+    phoneNumber: '',
+    password: '',
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,17 +35,43 @@ export function LandingPage() {
     setLoading(true);
 
     try {
-      const { error } = isLogin
-        ? await signIn(email, password)
-        : await signUp(email, password);
+      if (isLogin) {
+        const { error } = await signIn(formData.email, formData.password);
+        if (error) {
+          setError(error.message);
+        }
+      } else {
+        if (parseInt(formData.age) < 18) {
+          setError('You must be at least 18 years old to register.');
+          setLoading(false);
+          return;
+        }
 
-      if (error) {
-        setError(error.message);
-      } else if (!isLogin) {
-        setError('Registration successful! Please check your email to verify your account, then log in.');
-        setIsLogin(true);
-        setEmail('');
-        setPassword('');
+        const { error } = await signUp(
+          formData.email,
+          formData.password,
+          {
+            name: formData.name,
+            address: formData.address,
+            age: parseInt(formData.age),
+            phoneNumber: formData.phoneNumber,
+          }
+        );
+
+        if (error) {
+          setError(error.message);
+        } else {
+          setError('Registration successful! You can now sign in.');
+          setIsLogin(true);
+          setFormData({
+            name: '',
+            email: '',
+            address: '',
+            age: '',
+            phoneNumber: '',
+            password: '',
+          });
+        }
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred');
@@ -120,27 +159,97 @@ export function LandingPage() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
+                {!isLogin && (
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-white">Full Name</Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      type="text"
+                      placeholder="John Doe"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
+                    />
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-white">Email</Label>
                   <Input
                     id="email"
+                    name="email"
                     type="email"
                     placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={formData.email}
+                    onChange={handleInputChange}
                     required
                     className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
                   />
                 </div>
+
+                {!isLogin && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="address" className="text-white">Address</Label>
+                      <Input
+                        id="address"
+                        name="address"
+                        type="text"
+                        placeholder="123 Main St, City, Country"
+                        value={formData.address}
+                        onChange={handleInputChange}
+                        required
+                        className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="age" className="text-white">Age</Label>
+                        <Input
+                          id="age"
+                          name="age"
+                          type="number"
+                          placeholder="18"
+                          min="18"
+                          max="120"
+                          value={formData.age}
+                          onChange={handleInputChange}
+                          required
+                          className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="phoneNumber" className="text-white">Phone Number</Label>
+                        <Input
+                          id="phoneNumber"
+                          name="phoneNumber"
+                          type="tel"
+                          placeholder="+1234567890"
+                          value={formData.phoneNumber}
+                          onChange={handleInputChange}
+                          required
+                          className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+
                 <div className="space-y-2">
                   <Label htmlFor="password" className="text-white">Password</Label>
                   <Input
                     id="password"
+                    name="password"
                     type="password"
                     placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={formData.password}
+                    onChange={handleInputChange}
                     required
+                    minLength={6}
                     className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
                   />
                 </div>
