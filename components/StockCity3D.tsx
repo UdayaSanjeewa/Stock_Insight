@@ -42,7 +42,6 @@ export default function StockCity3D({ stocks, selectedStock, onSelectStock }: St
           const height = getBuildingHeight(stock.price);
           const colorClass = getBuildingColor(stock.changePercent);
           const isSelected = selectedStock?.symbol === stock.symbol;
-          const rotateY = (index - stocks.length / 2) * 4;
 
           return (
             <div
@@ -52,15 +51,15 @@ export default function StockCity3D({ stocks, selectedStock, onSelectStock }: St
                 height: `${height}px`,
                 width: '90px',
                 transformStyle: 'preserve-3d',
-                transform: `rotateY(${rotateY}deg) ${isSelected ? 'translateY(-20px)' : 'translateY(0)'}`,
+                transform: `rotateY(15deg) ${isSelected ? 'translateY(-20px)' : 'translateY(0)'}`,
                 alignSelf: 'flex-end'
               }}
               onClick={() => onSelectStock(stock)}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = `rotateY(${rotateY}deg) translateY(-15px)`;
+                e.currentTarget.style.transform = `rotateY(15deg) translateY(-15px)`;
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = `rotateY(${rotateY}deg) ${isSelected ? 'translateY(-20px)' : ''}`;
+                e.currentTarget.style.transform = `rotateY(15deg) ${isSelected ? 'translateY(-20px)' : ''}`;
               }}
             >
               <div
