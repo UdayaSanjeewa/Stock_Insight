@@ -1,7 +1,7 @@
 'use client';
 
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls, Text } from '@react-three/drei';
 import { useMemo } from 'react';
 import * as THREE from 'three';
 
@@ -141,6 +141,45 @@ function Building({
       </mesh>
 
       {windows}
+
+      <Text
+        position={[0, height + 0.5, 0]}
+        fontSize={0.4}
+        color="white"
+        anchorX="center"
+        anchorY="middle"
+        outlineWidth={0.02}
+        outlineColor="#000000"
+        font="/fonts/inter-bold.woff"
+      >
+        {label}
+      </Text>
+
+      <Text
+        position={[0, height + 0.1, 0]}
+        fontSize={0.25}
+        color="#ffffff"
+        anchorX="center"
+        anchorY="middle"
+        outlineWidth={0.015}
+        outlineColor="#000000"
+        font="/fonts/inter-regular.woff"
+      >
+        ${value.toFixed(2)}
+      </Text>
+
+      <Text
+        position={[0, height - 0.2, 0]}
+        fontSize={0.2}
+        color={change >= 0 ? '#10b981' : '#ef4444'}
+        anchorX="center"
+        anchorY="middle"
+        outlineWidth={0.012}
+        outlineColor="#000000"
+        font="/fonts/inter-bold.woff"
+      >
+        {change >= 0 ? '+' : ''}{change.toFixed(2)}%
+      </Text>
     </group>
   );
 }
@@ -221,37 +260,8 @@ function Scene({ data }: { data: BuildingData[] }) {
 }
 
 export default function Realistic3DBuildings({ data }: Realistic3DBuildingsProps) {
-  const stockColors = [
-    '#3b82f6',
-    '#10b981',
-    '#f59e0b',
-    '#ef4444',
-    '#8b5cf6',
-    '#ec4899',
-    '#06b6d4',
-    '#84cc16',
-    '#f97316',
-    '#6366f1'
-  ];
-
   return (
     <div className="w-full h-full relative">
-      <div className="absolute top-4 left-4 right-4 flex justify-around items-center flex-wrap gap-3 pointer-events-none z-10">
-        {data.map((item, index) => (
-          <div
-            key={index}
-            className="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg border-2"
-            style={{ borderColor: stockColors[index % stockColors.length] }}
-          >
-            <div className="font-bold text-sm text-gray-900">{item.label}</div>
-            <div className="text-xs text-gray-600 mt-0.5">${item.value.toFixed(2)}</div>
-            <div className={`text-xs font-semibold mt-1 ${item.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {item.change >= 0 ? '+' : ''}{item.change.toFixed(2)}%
-            </div>
-          </div>
-        ))}
-      </div>
-
       <Canvas shadows gl={{ antialias: true, alpha: true }} camera={{ position: [0, 6, 14], fov: 55 }}>
         <color attach="background" args={['#f9fafb']} />
         <Scene data={data} />
