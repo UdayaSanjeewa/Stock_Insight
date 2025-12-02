@@ -25,7 +25,7 @@ export function HistoryChart({ stockData, symbol, isLoading }: HistoryChartProps
     if (stockData && symbol) {
       const generateHistoricalData = () => {
         const basePrice = stockData.price || 100;
-        const data = [];
+        const data: Array<{date: Date; price: number; volume: number; change: number}> = [];
         
         const timeRangeConfig = {
           '1W': { points: 7, interval: 24 * 60 * 60 * 1000, label: '1 Week' },

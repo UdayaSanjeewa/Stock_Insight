@@ -25,7 +25,7 @@ export function PriceChart({ stockData, isLoading, isExpertMode }: PriceChartPro
     if (stockData) {
       const generateData = () => {
         const basePrice = stockData.price || 100;
-        const data = [];
+        const data: Array<{time: number; price: number; volume: number; open: number; high: number; low: number; close: number}> = [];
         
         // Define data points and intervals for different timeframes
         const timeframeConfig = {

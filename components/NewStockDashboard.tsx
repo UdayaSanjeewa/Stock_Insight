@@ -252,10 +252,10 @@ export function NewStockDashboard() {
           </div>
           
           <div className="h-96 flex items-center justify-center">
-            <BuildingVisualization 
-              stockData={currentStockData} 
+            <BuildingVisualization
+              stockData={currentStockData}
+              isLoading={false}
               isExpertMode={true}
-              type={isIndex ? 'index' : 'stock'}
             />
           </div>
         </div>

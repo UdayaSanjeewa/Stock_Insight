@@ -1,11 +1,11 @@
 'use client';
 
-import { NewStockDashboard } from '@/components/NewStockDashboard';
+import { StockCityDashboard } from '@/components/StockCityDashboard';
 
 export default function Home() {
   return (
-    <main className="min-h-screen gradient-bg">
-      <NewStockDashboard />
+    <main className="min-h-screen">
+      <StockCityDashboard />
     </main>
   );
 }

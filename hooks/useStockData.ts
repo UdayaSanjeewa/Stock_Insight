@@ -12,6 +12,7 @@ interface StockData {
   beta: number;
   peRatio: number;
   dividend: number;
+  dividendYield?: number;
   trend: string;
   high52w: number;
   low52w: number;
@@ -122,6 +123,7 @@ export function useStockData(symbol: string) {
       beta,
       peRatio,
       dividend,
+      dividendYield: dividend,
       trend,
       high52w,
       low52w,
