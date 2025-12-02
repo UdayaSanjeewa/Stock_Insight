@@ -91,23 +91,32 @@ export function useStockDataFromDB(symbol: string) {
 
   const triggerUpdate = async () => {
     try {
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const response = await fetch(`${supabaseUrl}/functions/v1/update-stock-data`, {
+      const functionUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/update-stock-data`;
+
+      console.log('Calling Edge Function:', functionUrl);
+
+      const response = await fetch(functionUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({}),
       });
 
+      console.log('Response status:', response.status);
+
+      const result = await response.json();
+      console.log('Response data:', result);
+
       if (!response.ok) {
-        throw new Error('Failed to trigger stock update');
+        throw new Error(result.error || 'Failed to trigger stock update');
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 5000));
 
       await refreshData();
 
-      return { success: true };
+      return { success: true, result };
     } catch (err: any) {
       console.error('Error triggering update:', err);
       return { success: false, error: err.message };

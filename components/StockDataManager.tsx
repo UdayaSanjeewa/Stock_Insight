@@ -7,14 +7,28 @@ import { useAllStocks, useStockDataFromDB } from '@/hooks/useStockDataFromDB';
 import { RefreshCw, TrendingUp, TrendingDown, DollarSign, BarChart3 } from 'lucide-react';
 
 export function StockDataManager() {
-  const { stocks, loading: stocksLoading } = useAllStocks();
+  const { stocks, loading: stocksLoading, refreshData: refreshStocks } = useAllStocks();
   const [selectedSymbol, setSelectedSymbol] = useState('AAPL');
-  const { stock, quote, prices, loading, triggerUpdate } = useStockDataFromDB(selectedSymbol);
+  const { stock, quote, prices, loading, triggerUpdate, refreshData } = useStockDataFromDB(selectedSymbol);
   const [updating, setUpdating] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState('');
 
   const handleUpdate = async () => {
     setUpdating(true);
-    await triggerUpdate();
+    setUpdateMessage('Fetching stock data from Yahoo Finance...');
+
+    const result = await triggerUpdate();
+
+    if (result.success) {
+      setUpdateMessage('Stock data updated successfully!');
+      await refreshStocks();
+      await refreshData();
+      setTimeout(() => setUpdateMessage(''), 5000);
+    } else {
+      setUpdateMessage(`Error: ${result.error}`);
+      setTimeout(() => setUpdateMessage(''), 5000);
+    }
+
     setUpdating(false);
   };
 
@@ -37,6 +51,11 @@ export function StockDataManager() {
         <div>
           <h2 className="text-3xl font-bold text-white">Stock Data Dashboard</h2>
           <p className="text-slate-400 mt-1">Real-time stock market data from Yahoo Finance</p>
+          {updateMessage && (
+            <p className={`text-sm mt-2 ${updateMessage.includes('Error') ? 'text-red-400' : 'text-emerald-400'}`}>
+              {updateMessage}
+            </p>
+          )}
         </div>
         <Button
           onClick={handleUpdate}
