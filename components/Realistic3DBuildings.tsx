@@ -16,6 +16,20 @@ interface Realistic3DBuildingsProps {
   data: BuildingData[];
 }
 
+function Window({ position, size = 0.08 }: { position: [number, number, number], size?: number }) {
+  return (
+    <mesh position={position}>
+      <boxGeometry args={[size, size, 0.02]} />
+      <meshStandardMaterial
+        color="#fef3c7"
+        emissive="#fbbf24"
+        emissiveIntensity={0.5}
+        roughness={0.2}
+      />
+    </mesh>
+  );
+}
+
 function Building({
   height,
   position,
@@ -50,6 +64,61 @@ function Building({
   const lightColor = new THREE.Color(mainColor).multiplyScalar(1.2);
   const darkColor = new THREE.Color(mainColor).multiplyScalar(0.6);
 
+  const windows = useMemo(() => {
+    const windowList: JSX.Element[] = [];
+    const windowSize = 0.08;
+    const windowSpacing = 0.25;
+    const rows = Math.floor(height / windowSpacing) - 1;
+    const cols = 4;
+    const startY = -height / 2 + windowSpacing;
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const x = (col - 1.5) * windowSpacing;
+        const y = startY + row * windowSpacing;
+
+        windowList.push(
+          <Window
+            key={`front-${row}-${col}`}
+            position={[x, y, depth / 2 + 0.01]}
+            size={windowSize}
+          />
+        );
+        windowList.push(
+          <Window
+            key={`back-${row}-${col}`}
+            position={[x, y, -depth / 2 - 0.01]}
+            size={windowSize}
+          />
+        );
+      }
+    }
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const z = (col - 1.5) * windowSpacing;
+        const y = startY + row * windowSpacing;
+
+        windowList.push(
+          <Window
+            key={`left-${row}-${col}`}
+            position={[-width / 2 - 0.01, y, z]}
+            size={windowSize}
+          />
+        );
+        windowList.push(
+          <Window
+            key={`right-${row}-${col}`}
+            position={[width / 2 + 0.01, y, z]}
+            size={windowSize}
+          />
+        );
+      }
+    }
+
+    return windowList;
+  }, [height, width, depth]);
+
   return (
     <group position={position}>
       <mesh geometry={geometry} position={[0, height / 2, 0]} castShadow receiveShadow>
@@ -79,6 +148,8 @@ function Building({
         <boxGeometry args={[width, height, 0.01]} />
         <meshStandardMaterial color={darkColor.getHex()} />
       </mesh>
+
+      {windows}
     </group>
   );
 }
