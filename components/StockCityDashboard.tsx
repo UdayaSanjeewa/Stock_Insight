@@ -46,7 +46,7 @@ export function StockCityDashboard() {
   const [sentiment, setSentiment] = useState([50]);
   const [priceRange, setPriceRange] = useState([0, 500]);
   const [cityView, setCityView] = useState(true);
-  const [chartView, setChartView] = useState<'city' | 'volume'>('city');
+  const [chartView, setChartView] = useState<'city' | 'volume' | 'analysis'>('city');
   const [currentTime, setCurrentTime] = useState(new Date());
 
   const stockSymbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NVDA', 'NFLX'];
@@ -240,13 +240,14 @@ export function StockCityDashboard() {
 
           <div>
             <Label className="text-sm font-medium mb-2 block">Chart Display</Label>
-            <Select value={chartView} onValueChange={(v) => setChartView(v as 'city' | 'volume')}>
+            <Select value={chartView} onValueChange={(v) => setChartView(v as 'city' | 'volume' | 'analysis')}>
               <SelectTrigger className="bg-slate-700 border-slate-600">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="city">3D City View</SelectItem>
                 <SelectItem value="volume">Volume Comparison</SelectItem>
+                <SelectItem value="analysis">Stock Analysis Grid</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -266,47 +267,71 @@ export function StockCityDashboard() {
                   selectedStock={selectedStock}
                   onSelectStock={(stock) => setSelectedStock(stock)}
                 />
-              ) : (
+              ) : chartView === 'volume' ? (
                 <VolumeChart3D stocks={stocks} />
+              ) : (
+                <div className="w-full h-full overflow-auto p-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {stocks.slice(0, 6).map((stock) => (
+                      <div key={stock.symbol} className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl overflow-hidden">
+                        <div className="p-4 border-b border-slate-700">
+                          <div className="flex items-baseline gap-2 mb-1">
+                            <div className="text-2xl font-bold">{stock.symbol}</div>
+                            <div className={`text-sm font-medium ${stock.changePercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                              {stock.changePercent >= 0 ? <TrendingUp className="inline w-3 h-3 mr-1" /> : <TrendingDown className="inline w-3 h-3 mr-1" />}
+                              {stock.changePercent >= 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
+                            </div>
+                          </div>
+                          <div className="text-xl font-bold">${stock.price.toFixed(2)}</div>
+                          <div className="text-xs text-slate-400 mt-1">{stock.name}</div>
+                        </div>
+                        <div className="h-[350px] bg-slate-900/30 p-3">
+                          <StockChart3D stock={stock} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
             </div>
 
-            {/* Details Panel Overlay with 3D Chart */}
-            {selectedStock && (
-              <div className="absolute top-4 right-4 w-[500px] bg-slate-800/95 backdrop-blur-md border border-slate-700 rounded-xl shadow-2xl overflow-hidden">
-                <div className="p-6 space-y-4 border-b border-slate-700">
-                  <div className="flex items-baseline gap-3">
-                    <div className="text-3xl font-bold">{selectedStock.symbol}</div>
-                    <div className={`text-lg font-medium ${selectedStock.changePercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {selectedStock.changePercent >= 0 ? <TrendingUp className="inline w-4 h-4 mr-1" /> : <TrendingDown className="inline w-4 h-4 mr-1" />}
-                      {selectedStock.changePercent >= 0 ? '+' : ''}{selectedStock.changePercent.toFixed(2)}%
-                    </div>
-                  </div>
-                  <div className="text-2xl font-bold">
-                    ${selectedStock.price.toFixed(2)}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <div className="text-xs text-slate-400 mb-1">Volume</div>
-                      <div className="font-semibold text-sm">{formatNumber(selectedStock.volume)}</div>
-                    </div>
-                    {selectedStock.marketCap && (
-                      <div>
-                        <div className="text-xs text-slate-400 mb-1">Market Cap</div>
-                        <div className="font-semibold text-sm">${formatNumber(selectedStock.marketCap)}</div>
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">Name</div>
-                    <div className="font-semibold text-sm">{selectedStock.name}</div>
+            {/* Compact Details Panel - Bottom Left */}
+            {selectedStock && chartView === 'city' && (
+              <div className="absolute bottom-4 left-4 w-80 bg-slate-800/95 backdrop-blur-md border border-slate-700 rounded-xl shadow-2xl p-4">
+                <div className="flex items-baseline gap-2 mb-2">
+                  <div className="text-2xl font-bold">{selectedStock.symbol}</div>
+                  <div className={`text-sm font-medium ${selectedStock.changePercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                    {selectedStock.changePercent >= 0 ? <TrendingUp className="inline w-3 h-3 mr-1" /> : <TrendingDown className="inline w-3 h-3 mr-1" />}
+                    {selectedStock.changePercent >= 0 ? '+' : ''}{selectedStock.changePercent.toFixed(2)}%
                   </div>
                 </div>
+                <div className="text-xl font-bold mb-3">
+                  ${selectedStock.price.toFixed(2)}
+                </div>
 
-                {/* 3D Chart Section */}
-                <div className="h-[400px] bg-slate-900/50 p-4">
-                  <StockChart3D stock={selectedStock} />
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <div className="text-xs text-slate-400">High</div>
+                    <div className="font-semibold text-green-400">${selectedStock.high.toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-400">Low</div>
+                    <div className="font-semibold text-red-400">${selectedStock.low.toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-400">Volume</div>
+                    <div className="font-semibold text-xs">{formatNumber(selectedStock.volume)}</div>
+                  </div>
+                  {selectedStock.marketCap && (
+                    <div>
+                      <div className="text-xs text-slate-400">Market Cap</div>
+                      <div className="font-semibold text-xs">${formatNumber(selectedStock.marketCap)}</div>
+                    </div>
+                  )}
+                </div>
+                <div className="mt-3 pt-3 border-t border-slate-700">
+                  <div className="text-xs text-slate-400">Company</div>
+                  <div className="font-semibold text-xs">{selectedStock.name}</div>
                 </div>
               </div>
             )}
