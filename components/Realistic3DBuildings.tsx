@@ -50,16 +50,7 @@ function Building({
 
   const geometry = useMemo(() => new THREE.BoxGeometry(width, height, depth), [height]);
 
-  const colorMap: Record<string, string> = {
-    green: '#7ed321',
-    purple: '#6366f1',
-    pink: '#ec4899',
-    cyan: '#06b6d4',
-    blue: '#3b82f6',
-    red: '#ef4444',
-  };
-
-  const mainColor = colorMap[color] || '#6366f1';
+  const mainColor = color;
 
   const lightColor = new THREE.Color(mainColor).multiplyScalar(1.2);
   const darkColor = new THREE.Color(mainColor).multiplyScalar(0.6);
@@ -157,9 +148,22 @@ function Building({
 function Scene({ data }: { data: BuildingData[] }) {
   const maxValue = Math.max(...data.map(d => d.value));
 
+  const stockColors = [
+    '#3b82f6',
+    '#10b981',
+    '#f59e0b',
+    '#ef4444',
+    '#8b5cf6',
+    '#ec4899',
+    '#06b6d4',
+    '#84cc16',
+    '#f97316',
+    '#6366f1'
+  ];
+
   const buildings = useMemo(() => {
     return data.map((item, index) => {
-      const normalizedHeight = (item.value / maxValue) * 6 + 1;
+      const normalizedHeight = (item.value / maxValue) * 5 + 1;
       const spacing = 2.5;
       const totalWidth = (data.length - 1) * spacing;
       const xPosition = index * spacing - totalWidth / 2;
@@ -167,7 +171,7 @@ function Scene({ data }: { data: BuildingData[] }) {
       return {
         height: normalizedHeight,
         position: [xPosition, 0, 0] as [number, number, number],
-        color: item.change >= 0 ? 'green' : 'red',
+        color: stockColors[index % stockColors.length],
         label: item.label,
         value: item.value,
         change: item.change,
@@ -177,13 +181,13 @@ function Scene({ data }: { data: BuildingData[] }) {
 
   return (
     <>
-      <PerspectiveCamera makeDefault position={[8, 6, 12]} fov={50} />
       <OrbitControls
         enablePan={false}
         minPolarAngle={Math.PI / 6}
-        maxPolarAngle={Math.PI / 2.5}
-        minDistance={10}
-        maxDistance={25}
+        maxPolarAngle={Math.PI / 2.2}
+        minDistance={12}
+        maxDistance={30}
+        target={[0, 2, 0]}
       />
 
       <ambientLight intensity={0.4} />
@@ -217,16 +221,28 @@ function Scene({ data }: { data: BuildingData[] }) {
 }
 
 export default function Realistic3DBuildings({ data }: Realistic3DBuildingsProps) {
+  const stockColors = [
+    '#3b82f6',
+    '#10b981',
+    '#f59e0b',
+    '#ef4444',
+    '#8b5cf6',
+    '#ec4899',
+    '#06b6d4',
+    '#84cc16',
+    '#f97316',
+    '#6366f1'
+  ];
+
   return (
     <div className="w-full h-full relative">
-      <Canvas shadows gl={{ antialias: true, alpha: true }}>
-        <color attach="background" args={['#f9fafb']} />
-        <Scene data={data} />
-      </Canvas>
-
-      <div className="absolute bottom-4 left-4 right-4 flex justify-around items-center flex-wrap gap-4 pointer-events-none">
+      <div className="absolute top-4 left-4 right-4 flex justify-around items-center flex-wrap gap-3 pointer-events-none z-10">
         {data.map((item, index) => (
-          <div key={index} className="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg border border-gray-200">
+          <div
+            key={index}
+            className="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg border-2"
+            style={{ borderColor: stockColors[index % stockColors.length] }}
+          >
             <div className="font-bold text-sm text-gray-900">{item.label}</div>
             <div className="text-xs text-gray-600 mt-0.5">${item.value.toFixed(2)}</div>
             <div className={`text-xs font-semibold mt-1 ${item.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -235,6 +251,11 @@ export default function Realistic3DBuildings({ data }: Realistic3DBuildingsProps
           </div>
         ))}
       </div>
+
+      <Canvas shadows gl={{ antialias: true, alpha: true }} camera={{ position: [0, 6, 14], fov: 55 }}>
+        <color attach="background" args={['#f9fafb']} />
+        <Scene data={data} />
+      </Canvas>
     </div>
   );
 }

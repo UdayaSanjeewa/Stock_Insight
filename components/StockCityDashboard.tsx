@@ -275,6 +275,7 @@ export function StockCityDashboard() {
                     label: stock.symbol,
                     value: stock.price,
                     color: stock.changePercent >= 0 ? 'from-emerald-500 to-emerald-700' : 'from-red-500 to-red-700',
+                    sublabel: `${stock.changePercent >= 0 ? '+' : ''}${stock.changePercent.toFixed(2)}%`,
                     secondaryLabel: stock.name
                   }))}
                   title="Stock Market City"
