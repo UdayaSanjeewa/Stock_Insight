@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Building2, Cloud, User, TrendingUp, TrendingDown } from 'lucide-react';
+import { Building2, Cloud, User, TrendingUp, TrendingDown, LogOut } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
 
 const StockCity3D = dynamic(() => import('./StockCity3D'), { ssr: false });
 const StockCityRealistic = dynamic(() => import('./StockCityRealistic'), { ssr: false });
@@ -39,6 +41,7 @@ interface MarketIndex {
 }
 
 export function StockCityDashboard() {
+  const { user, signOut } = useAuth();
   const [stocks, setStocks] = useState<StockData[]>([]);
   const [marketIndices, setMarketIndices] = useState<MarketIndex[]>([]);
   const [selectedStock, setSelectedStock] = useState<StockData | null>(null);
@@ -51,6 +54,10 @@ export function StockCityDashboard() {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   const stockSymbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NVDA', 'NFLX'];
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -179,9 +186,20 @@ export function StockCityDashboard() {
         <div className="text-3xl font-mono">
           {currentTime.toLocaleTimeString()}
         </div>
-        <button className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center hover:bg-slate-600 transition-colors">
-          <User className="w-6 h-6" />
-        </button>
+        <div className="flex items-center gap-4">
+          <div className="text-sm text-slate-400">
+            {user?.email}
+          </div>
+          <Button
+            onClick={handleSignOut}
+            variant="outline"
+            size="sm"
+            className="bg-slate-700 border-slate-600 hover:bg-slate-600 text-white"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Sign Out
+          </Button>
+        </div>
       </header>
 
       <div className="flex h-[calc(100vh-88px)]">
