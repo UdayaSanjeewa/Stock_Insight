@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-interface StockData {
+export interface StockData {
   symbol: string;
   price: number;
   changePercent: number;
