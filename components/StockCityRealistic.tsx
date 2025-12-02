@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Realistic3DBuildings from './Realistic3DBuildings';
 
 interface ChartDataPoint {
   label: string;
@@ -14,9 +15,10 @@ interface StockCityRealisticProps {
   data: ChartDataPoint[];
   title: string;
   maxValue?: number;
+  use3D?: boolean;
 }
 
-export default function StockCityRealistic({ data, title, maxValue }: StockCityRealisticProps) {
+export default function StockCityRealistic({ data, title, maxValue, use3D = true }: StockCityRealisticProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [rotation, setRotation] = useState({ x: -25, y: 20 });
   const [isDragging, setIsDragging] = useState(false);
@@ -51,6 +53,26 @@ export default function StockCityRealistic({ data, title, maxValue }: StockCityR
   ];
 
   const getBuildingStyle = (index: number) => buildingStyles[index % buildingStyles.length];
+
+  if (use3D) {
+    const transformedData = data.map(item => ({
+      label: item.label,
+      value: item.value,
+      change: parseFloat(item.sublabel?.replace('%', '') || '0'),
+      color: item.color
+    }));
+
+    return (
+      <div className="w-full h-full flex flex-col">
+        <div className="text-2xl font-bold mb-4 text-center bg-gradient-to-r from-slate-200 to-slate-400 bg-clip-text text-transparent">
+          {title}
+        </div>
+        <div className="flex-1 rounded-2xl overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100">
+          <Realistic3DBuildings data={transformedData} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full flex flex-col">
