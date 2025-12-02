@@ -177,8 +177,8 @@ export function StockCityDashboard() {
         </button>
       </header>
 
-      <div className="flex h-[calc(100vh-88px)]">
-        <aside className="w-72 bg-slate-800/50 backdrop-blur-sm p-6 space-y-6 border-r border-slate-700">
+      <div className="flex flex-col h-[calc(100vh-88px)]">
+        <aside className="hidden">
           <div>
             <Label className="text-sm font-medium mb-2 block">Sector</Label>
             <Select value={sector} onValueChange={setSector}>
@@ -238,13 +238,13 @@ export function StockCityDashboard() {
           </div>
         </aside>
 
-        <main className="flex-1 flex flex-col">
+        <main className="flex-1 flex flex-col relative">
           <div className="flex-1 relative overflow-hidden">
             <div className="absolute inset-0 flex items-end justify-center px-12 pb-24">
               <Cloud className="absolute top-20 left-32 w-24 h-24 text-slate-600 opacity-50" />
               <Cloud className="absolute top-32 right-48 w-32 h-32 text-slate-600 opacity-40" />
 
-              <div className="relative flex items-end justify-center gap-8 perspective-1000">
+              <div className="relative flex items-end justify-center gap-6" style={{ perspective: '1500px', transformStyle: 'preserve-3d' }}>
                 {stocks.map((stock, index) => {
                   const height = getBuildingHeight(stock.price);
                   const colorClass = getBuildingColor(stock.changePercent);
@@ -253,15 +253,37 @@ export function StockCityDashboard() {
                   return (
                     <div
                       key={stock.symbol}
-                      className="relative cursor-pointer transform transition-all duration-300 hover:scale-105"
-                      style={{ height: `${height}px` }}
+                      className="relative cursor-pointer transition-all duration-300 hover:translate-y-[-10px]"
+                      style={{
+                        height: `${height}px`,
+                        transform: `rotateY(${index * 2 - 7}deg)`,
+                        transformStyle: 'preserve-3d'
+                      }}
                       onClick={() => setSelectedStock(stock)}
                     >
                       <div
-                        className={`w-32 h-full bg-gradient-to-b ${colorClass} rounded-t-lg relative overflow-hidden shadow-2xl ${
+                        className={`w-28 h-full bg-gradient-to-b ${colorClass} rounded-t-lg relative overflow-hidden ${
                           isSelected ? 'ring-4 ring-blue-500' : ''
                         }`}
+                        style={{
+                          boxShadow: `
+                            ${isSelected ? '0 0 30px rgba(59, 130, 246, 0.6),' : ''}
+                            20px 20px 60px rgba(0, 0, 0, 0.5),
+                            -10px -10px 30px rgba(255, 255, 255, 0.05),
+                            inset 5px 5px 10px rgba(255, 255, 255, 0.1)
+                          `,
+                          transform: 'translateZ(20px)'
+                        }}
                       >
+                        {/* Side panel for 3D effect */}
+                        <div
+                          className={`absolute top-0 right-0 h-full w-3 bg-gradient-to-r ${colorClass} opacity-40`}
+                          style={{
+                            transform: 'rotateY(90deg) translateZ(12px)',
+                            transformOrigin: 'right',
+                            filter: 'brightness(0.6)'
+                          }}
+                        />
                         <div className="absolute inset-0 grid grid-cols-4 gap-1 p-2">
                           {Array.from({ length: Math.floor(height / 20) }).map((_, i) => (
                             <div
@@ -288,7 +310,13 @@ export function StockCityDashboard() {
                         </div>
                       </div>
 
-                      <div className="absolute -bottom-2 left-0 right-0 h-2 bg-slate-900/80 rounded-b-sm" />
+                      {/* 3D Base */}
+                      <div
+                        className="absolute -bottom-2 left-0 right-0 h-2 bg-slate-900/80 rounded-b-sm"
+                        style={{
+                          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.8)'
+                        }}
+                      />
                     </div>
                   );
                 })}
@@ -315,102 +343,69 @@ export function StockCityDashboard() {
           </footer>
         </main>
 
-        <aside className="w-96 bg-slate-800/50 backdrop-blur-sm p-6 border-l border-slate-700">
-          <h2 className="text-2xl font-bold mb-6">Details</h2>
-
-          {selectedStock && (
-            <div className="space-y-6">
-              <div>
-                <div className="text-4xl font-bold mb-2">{selectedStock.symbol}</div>
-                <div className="text-3xl font-bold mb-1">
-                  ${selectedStock.price.toFixed(2)}
-                </div>
-                <div className={`text-lg font-medium ${selectedStock.changePercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                  {selectedStock.changePercent >= 0 ? <TrendingUp className="inline w-5 h-5 mr-1" /> : <TrendingDown className="inline w-5 h-5 mr-1" />}
-                  {selectedStock.changePercent >= 0 ? '+' : ''}{selectedStock.changePercent.toFixed(2)}%
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-400">High</span>
-                  <span className="font-medium">${selectedStock.high.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-400">Low</span>
-                  <span className="font-medium">${selectedStock.low.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-400">Open</span>
-                  <span className="font-medium">${selectedStock.open.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-400">Prev Close</span>
-                  <span className="font-medium">${selectedStock.previousClose.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-400">Volume</span>
-                  <span className="font-medium">{formatNumber(selectedStock.volume)}</span>
-                </div>
-                {selectedStock.marketCap && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Market Cap</span>
-                    <span className="font-medium">${formatNumber(selectedStock.marketCap)}</span>
+        {/* Details Panel at Bottom */}
+        <aside className="bg-slate-800/90 backdrop-blur-sm border-t border-slate-700">
+          {selectedStock ? (
+            <div className="px-8 py-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Stock Info */}
+                <div className="space-y-3">
+                  <div className="flex items-baseline gap-3">
+                    <div className="text-3xl font-bold">{selectedStock.symbol}</div>
+                    <div className={`text-lg font-medium ${selectedStock.changePercent >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {selectedStock.changePercent >= 0 ? <TrendingUp className="inline w-4 h-4 mr-1" /> : <TrendingDown className="inline w-4 h-4 mr-1" />}
+                      {selectedStock.changePercent >= 0 ? '+' : ''}{selectedStock.changePercent.toFixed(2)}%
+                    </div>
                   </div>
-                )}
-                {selectedStock.sentiment !== undefined && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Sentiment</span>
-                    <span className="font-medium">{selectedStock.sentiment.toFixed(2)}</span>
+                  <div className="text-2xl font-bold">
+                    ${selectedStock.price.toFixed(2)}
                   </div>
-                )}
-              </div>
+                </div>
 
-              <div className="pt-4">
-                <div className="h-24 flex items-end gap-1">
-                  {Array.from({ length: 30 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="flex-1 bg-slate-600 rounded-t-sm"
-                      style={{ height: `${Math.random() * 100}%` }}
-                    />
-                  ))}
+                {/* Stats Grid */}
+                <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div>
+                    <div className="text-xs text-slate-400 mb-1">High</div>
+                    <div className="font-semibold text-green-400">${selectedStock.high.toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-400 mb-1">Low</div>
+                    <div className="font-semibold text-red-400">${selectedStock.low.toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-400 mb-1">Open</div>
+                    <div className="font-semibold">${selectedStock.open.toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-400 mb-1">Prev Close</div>
+                    <div className="font-semibold">${selectedStock.previousClose.toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-400 mb-1">Volume</div>
+                    <div className="font-semibold">{formatNumber(selectedStock.volume)}</div>
+                  </div>
+                  {selectedStock.marketCap && (
+                    <div>
+                      <div className="text-xs text-slate-400 mb-1">Market Cap</div>
+                      <div className="font-semibold">${formatNumber(selectedStock.marketCap)}</div>
+                    </div>
+                  )}
+                  {selectedStock.sentiment !== undefined && (
+                    <div>
+                      <div className="text-xs text-slate-400 mb-1">Sentiment</div>
+                      <div className="font-semibold">{selectedStock.sentiment.toFixed(2)}</div>
+                    </div>
+                  )}
+                  <div>
+                    <div className="text-xs text-slate-400 mb-1">Name</div>
+                    <div className="font-semibold text-sm truncate">{selectedStock.name}</div>
+                  </div>
                 </div>
               </div>
-
-              <button className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
-                Compare
-              </button>
-
-              <Card className="bg-slate-700/50 border-slate-600 p-6">
-                <h3 className="text-lg font-bold mb-4">Market Sentiment</h3>
-                <div className="relative h-32 flex items-center justify-center">
-                  <svg className="transform -rotate-90 w-32 h-32">
-                    <circle
-                      cx="64"
-                      cy="64"
-                      r="56"
-                      stroke="currentColor"
-                      strokeWidth="8"
-                      fill="none"
-                      className="text-slate-600"
-                    />
-                    <circle
-                      cx="64"
-                      cy="64"
-                      r="56"
-                      stroke="currentColor"
-                      strokeWidth="8"
-                      fill="none"
-                      strokeDasharray={`${2 * Math.PI * 56}`}
-                      strokeDashoffset={`${2 * Math.PI * 56 * (1 - 0.65)}`}
-                      className="text-emerald-500 transition-all duration-1000"
-                    />
-                  </svg>
-                  <div className="absolute text-2xl font-bold">65%</div>
-                </div>
-                <div className="text-center mt-2 text-sm text-slate-400">Market Sentiment</div>
-              </Card>
+            </div>
+          ) : (
+            <div className="px-8 py-4 text-center text-slate-400">
+              Click on a building to view stock details
             </div>
           )}
         </aside>

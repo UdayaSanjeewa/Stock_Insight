@@ -362,21 +362,56 @@ const maxHeight = 500; // Increase maximum height
 
 ---
 
+## UI Layout & Design
+
+The Stock City Dashboard features a clean, immersive full-screen layout:
+
+### Layout Structure
+- **Header Bar**: Fixed top bar with "Stock City" title, real-time clock, and user icon
+- **Main Visualization Area**: Full-screen 3D city skyline with interactive stock buildings
+  - Buildings displayed with 3D perspective and depth effects
+  - Each building slightly rotated for realistic cityscape appearance
+  - Smooth hover effects that lift buildings upward
+  - Selected building highlighted with glowing blue ring
+- **Details Panel (Bottom)**: Horizontal panel showing selected stock information
+  - Compact horizontal layout maximizes building visibility
+  - Three-column grid: Stock info | Key metrics grid | Empty space
+  - Only visible when a stock is selected
+  - Shows: Symbol, Price, Change %, High, Low, Open, Previous Close, Volume, Market Cap, Sentiment, Name
+- **Market Indices Footer**: Shows S&P 500, NASDAQ, and DOW with current values and changes
+
+### 3D Visual Effects
+The buildings feature realistic 3D styling:
+- **Perspective Transformation**: Each building rotates 2-14 degrees on Y-axis for depth
+- **Side Panels**: Visible side faces on buildings for 3D appearance
+- **Multi-Layer Shadows**: Deep shadows beneath buildings and inset lighting highlights
+- **3D Base Platform**: Dark platform with shadows under each building
+- **Smooth Animations**: Hover lifts buildings 10px upward, selection adds glowing ring
+- **Color Gradients**: Vertical gradients on building faces simulate lighting
+- **Window Lighting**: Yellow-tinted windows arranged in grid pattern
+
+### Responsive Behavior
+- Left sidebar automatically hidden for maximum screen space
+- Details panel uses responsive grid (1 column on mobile, 3 columns on desktop)
+- Buildings scale proportionally to screen size
+- Footer adapts to available width
+
 ## Summary
 
-The Stock City Dashboard provides a unique visualization of stock market data using a city skyline metaphor. Data flows from Yahoo Finance API through React state management to create an interactive, real-time display. Buildings represent stocks with height proportional to price and color indicating performance. The system updates automatically every 60 seconds, providing a continuously fresh view of market conditions.
+The Stock City Dashboard provides a unique visualization of stock market data using a city skyline metaphor. Data flows from simulated sources through React state management to create an interactive, real-time display. Buildings represent stocks with height proportional to price and color indicating performance. The system updates automatically every 60 seconds, providing a continuously fresh view of market conditions.
 
 ### Key Features
-✅ Real-time stock data from Yahoo Finance API
-✅ 8 major tech stocks visualized as buildings
+✅ Simulated real-time stock data (no CORS issues)
+✅ 8 major tech stocks visualized as 3D buildings
 ✅ 3 market indices displayed in footer
-✅ Interactive building selection
-✅ Detailed stock information panel
+✅ Interactive building selection with 3D effects
+✅ Horizontal details panel at bottom
 ✅ Automatic updates every 60 seconds
 ✅ No API key required
 ✅ No database needed (optional for historical data)
+✅ Full-screen immersive visualization
 
 ### Data Flow Summary
 ```
-Yahoo Finance API → fetch() → JSON parsing → State update → React rendering → Visual display
+Simulated Data Generation → State update → React rendering → 3D Visual display
 ```
